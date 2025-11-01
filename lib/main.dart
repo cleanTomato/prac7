@@ -4,3 +4,4 @@ import 'package:water_tracker/app.dart';
 void main() {
   runApp(const App());
 }
+
