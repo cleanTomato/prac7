@@ -1,0 +1,87 @@
+import 'package:flutter/material.dart';
+import 'package:water_tracker/features/water_tracker/models/water_intake.dart';
+import 'package:water_tracker/shared/constants/drink_types.dart';
+
+class StatisticsScreen extends StatelessWidget {
+  final List<WaterIntake> intakes;
+  final int dailyGoal;
+
+  const StatisticsScreen({
+    super.key,
+    required this.intakes,
+    required this.dailyGoal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final totalIntake = intakes.fold(0, (sum, intake) => sum + intake.effectiveVolume);
+    final progress = dailyGoal > 0 ? totalIntake / dailyGoal : 0.0;
+
+    final drinkStats = <String, int>{};
+    for (final intake in intakes) {
+      drinkStats[intake.drinkType] = (drinkStats[intake.drinkType] ?? 0) + intake.volume;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context), // Вертикальный возврат - pop
+        ),
+        title: const Text('Статистика'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Общая статистика',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text('Выпито всего: $totalIntake мл'),
+                    Text('Дневная цель: $dailyGoal мл'),
+                    Text('Прогресс: ${(progress * 100).toStringAsFixed(1)}%'),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Статистика по напиткам:',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ListView(
+                children: drinkStats.entries.map((entry) {
+                  final drink = DrinkTypes.allTypes.firstWhere(
+                        (d) => d.id == entry.key,
+                    orElse: () => DrinkTypes.allTypes.first,
+                  );
+                  return ListTile(
+                    leading: Icon(drink.icon, color: drink.color),
+                    title: Text(drink.name),
+                    trailing: Text('${entry.value} мл'),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
