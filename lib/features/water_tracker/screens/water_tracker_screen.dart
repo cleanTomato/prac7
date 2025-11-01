@@ -1,63 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:water_tracker/features/water_tracker/models/water_intake.dart';
 import 'package:water_tracker/features/water_tracker/widgets/intake_list_view.dart';
 import 'package:water_tracker/features/water_tracker/widgets/smart_water_button.dart';
 import 'package:water_tracker/features/water_tracker/widgets/water_level_indicator.dart';
 import 'package:water_tracker/features/water_tracker/widgets/progress_circle.dart';
+import 'package:water_tracker/features/water_tracker/state/water_tracker_state.dart';
 
 class WaterTrackerScreen extends StatelessWidget {
-  final List<WaterIntake> intakes;
-  final int dailyGoal;
-  final VoidCallback onAdd;
-  final ValueChanged<String> onDelete;
-  final ValueChanged<int> onGoalChange;
-  final VoidCallback onShowStatistics;
-  final VoidCallback onShowHistory;
-  final VoidCallback onShowSettings;
-  final VoidCallback onShowGallery;
+  final WaterTrackerState appState;
 
   const WaterTrackerScreen({
     super.key,
-    required this.intakes,
-    required this.dailyGoal,
-    required this.onAdd,
-    required this.onDelete,
-    required this.onGoalChange,
-    required this.onShowStatistics,
-    required this.onShowHistory,
-    required this.onShowSettings,
-    required this.onShowGallery,
+    required this.appState,
   });
 
   @override
   Widget build(BuildContext context) {
-    final totalIntake = intakes.fold(0, (sum, intake) => sum + intake.effectiveVolume);
-    final progress = dailyGoal > 0 ? totalIntake / dailyGoal : 0.0;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Водный баланс'),
         actions: [
-          // Иконки в AppBar - вертикальная навигация (push)
+
           IconButton(
             icon: const Icon(Icons.photo_library),
-            onPressed: onShowGallery,
+            onPressed: () => context.push('/gallery'),
             tooltip: 'Галерея напитков',
           ),
           IconButton(
             icon: const Icon(Icons.bar_chart),
-            onPressed: onShowStatistics,
+            onPressed: () => context.push('/statistics'),
             tooltip: 'Статистика',
           ),
           IconButton(
             icon: const Icon(Icons.history),
-            onPressed: onShowHistory,
+            onPressed: () => context.push('/history'),
             tooltip: 'История',
           ),
-          // Иконка настроек - горизонтальная навигация (pushReplacement)
+
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: onShowSettings,
+            onPressed: () => context.go('/settings'),
             tooltip: 'Настройки',
           ),
         ],
@@ -70,31 +53,31 @@ class WaterTrackerScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ProgressCircle(
-                  progress: progress.toDouble(),
-                  current: totalIntake,
-                  goal: dailyGoal,
+                  progress: appState.progress,
+                  current: appState.totalIntake,
+                  goal: appState.dailyGoal,
                 ),
-                WaterLevelIndicator(progress: progress.toDouble()),
+                WaterLevelIndicator(progress: appState.progress),
               ],
             ),
             const SizedBox(height: 20),
 
-            // Основная кнопка - вертикальная навигация
+
             SmartWaterButton(
-              currentVolume: totalIntake,
-              dailyGoal: dailyGoal,
-              onPressed: onAdd,
+              currentVolume: appState.totalIntake,
+              dailyGoal: appState.dailyGoal,
+              onPressed: () => context.push('/add'),
             ),
             const SizedBox(height: 10),
 
-            // Кнопки навигации
+
             Column(
               children: [
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: onShowGallery, // Вертикальная
+                        onPressed: () => context.push('/gallery'),
                         icon: const Icon(Icons.photo_library),
                         label: const Text('Галерея'),
                         style: ElevatedButton.styleFrom(
@@ -105,7 +88,7 @@ class WaterTrackerScreen extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: onShowStatistics, // Вертикальная
+                        onPressed: () => context.push('/statistics'),
                         icon: const Icon(Icons.bar_chart),
                         label: const Text('Статистика'),
                         style: ElevatedButton.styleFrom(
@@ -120,7 +103,7 @@ class WaterTrackerScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: onShowHistory, // Вертикальная
+                        onPressed: () => context.push('/history'),
                         icon: const Icon(Icons.history),
                         label: const Text('История'),
                         style: ElevatedButton.styleFrom(
@@ -131,7 +114,7 @@ class WaterTrackerScreen extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: onShowSettings, // Горизонтальная
+                        onPressed: () => context.go('/settings'),
                         icon: const Icon(Icons.settings),
                         label: const Text('Настройки'),
                         style: ElevatedButton.styleFrom(
@@ -147,8 +130,8 @@ class WaterTrackerScreen extends StatelessWidget {
             const SizedBox(height: 20),
             Expanded(
               child: IntakeListView(
-                intakes: intakes,
-                onDelete: onDelete,
+                intakes: appState.intakes,
+                onDelete: appState.deleteIntake,
               ),
             ),
           ],

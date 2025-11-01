@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:water_tracker/shared/constants/drink_types.dart';
+import 'package:water_tracker/features/water_tracker/state/water_tracker_state.dart';
+import 'package:water_tracker/features/water_tracker/models/water_intake.dart';
 
 class AddIntakeScreen extends StatefulWidget {
-  final Function(int volume, String drinkType) onSave;
+  final WaterTrackerState appState;
 
   const AddIntakeScreen({
     super.key,
-    required this.onSave,
+    required this.appState,
   });
 
   @override
@@ -22,8 +25,14 @@ class _AddIntakeScreenState extends State<AddIntakeScreen> {
     final volume = int.tryParse(_volumeController.text);
 
     if (volume != null && volume > 0) {
-      widget.onSave(volume, _selectedDrinkType);
-      Navigator.pop(context); // Вертикальный возврат - pop
+      final newIntake = WaterIntake(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        volume: volume,
+        drinkType: _selectedDrinkType,
+        time: DateTime.now(),
+      );
+      widget.appState.addIntake(newIntake);
+      context.pop();
     } else {
       _showErrorDialog('Пожалуйста, введите корректное количество мл (больше 0)');
     }
@@ -37,7 +46,7 @@ class _AddIntakeScreenState extends State<AddIntakeScreen> {
         content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('OK'),
           ),
         ],
@@ -71,7 +80,7 @@ class _AddIntakeScreenState extends State<AddIntakeScreen> {
         title: const Text('Добавить запись'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context), // Вертикальный возврат - pop
+          onPressed: () => context.pop(),
         ),
       ),
       body: Padding(
@@ -161,7 +170,7 @@ class _AddIntakeScreenState extends State<AddIntakeScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context), // Вертикальный возврат - pop
+                    onPressed: () => context.pop(),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),

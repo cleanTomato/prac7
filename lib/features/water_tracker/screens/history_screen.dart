@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:water_tracker/features/water_tracker/models/water_intake.dart';
 import 'package:water_tracker/features/water_tracker/widgets/intake_list_view.dart';
+import 'package:water_tracker/features/water_tracker/state/water_tracker_state.dart';
 
 class HistoryScreen extends StatelessWidget {
-  final List<WaterIntake> intakes;
-  final ValueChanged<String> onDelete;
+  final WaterTrackerState appState;
 
   const HistoryScreen({
     super.key,
-    required this.intakes,
-    required this.onDelete,
+    required this.appState,
   });
 
   @override
   Widget build(BuildContext context) {
-    final sortedIntakes = List<WaterIntake>.from(intakes)
+    final sortedIntakes = List<WaterIntake>.from(appState.intakes)
       ..sort((a, b) => b.time.compareTo(a.time));
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context), // Вертикальный возврат - pop
+          onPressed: () => context.pop(),
         ),
         title: const Text('История записей'),
       ),
       body: IntakeListView(
         intakes: sortedIntakes,
-        onDelete: onDelete,
+        onDelete: appState.deleteIntake,
       ),
     );
   }

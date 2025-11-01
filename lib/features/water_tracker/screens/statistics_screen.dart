@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:water_tracker/features/water_tracker/models/water_intake.dart';
 import 'package:water_tracker/shared/constants/drink_types.dart';
+import 'package:water_tracker/features/water_tracker/state/water_tracker_state.dart';
 
 class StatisticsScreen extends StatelessWidget {
-  final List<WaterIntake> intakes;
-  final int dailyGoal;
+  final WaterTrackerState appState;
 
   const StatisticsScreen({
     super.key,
-    required this.intakes,
-    required this.dailyGoal,
+    required this.appState,
   });
 
   @override
   Widget build(BuildContext context) {
-    final totalIntake = intakes.fold(0, (sum, intake) => sum + intake.effectiveVolume);
-    final progress = dailyGoal > 0 ? totalIntake / dailyGoal : 0.0;
-
     final drinkStats = <String, int>{};
-    for (final intake in intakes) {
+    for (final intake in appState.intakes) {
       drinkStats[intake.drinkType] = (drinkStats[intake.drinkType] ?? 0) + intake.volume;
     }
 
@@ -26,7 +23,7 @@ class StatisticsScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context), // Вертикальный возврат - pop
+          onPressed: () => context.pop(),
         ),
         title: const Text('Статистика'),
       ),
@@ -48,9 +45,9 @@ class StatisticsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text('Выпито всего: $totalIntake мл'),
-                    Text('Дневная цель: $dailyGoal мл'),
-                    Text('Прогресс: ${(progress * 100).toStringAsFixed(1)}%'),
+                    Text('Выпито всего: ${appState.totalIntake} мл'),
+                    Text('Дневная цель: ${appState.dailyGoal} мл'),
+                    Text('Прогресс: ${(appState.progress * 100).toStringAsFixed(1)}%'),
                   ],
                 ),
               ),

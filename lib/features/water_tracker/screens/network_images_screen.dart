@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class NetworkImagesScreen extends StatelessWidget {
@@ -33,7 +34,7 @@ class NetworkImagesScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context), // Вертикальный возврат - pop
+          onPressed: () => context.pop(),
         ),
         title: const Text('Галерея напитков'),
       ),

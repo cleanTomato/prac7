@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:water_tracker/shared/constants/app_constants.dart';
+import 'package:water_tracker/features/water_tracker/state/water_tracker_state.dart';
 
 class SettingsScreen extends StatelessWidget {
-  final int dailyGoal;
-  final ValueChanged<int> onGoalChange;
-  final Function(BuildContext) onNavigateToMain;
+  final WaterTrackerState appState;
 
   const SettingsScreen({
     super.key,
-    required this.dailyGoal,
-    required this.onGoalChange,
-    required this.onNavigateToMain,
+    required this.appState,
   });
 
   @override
   Widget build(BuildContext context) {
-    final controller = TextEditingController(text: dailyGoal.toString());
+    final controller = TextEditingController(text: appState.dailyGoal.toString());
 
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         final newGoal = int.tryParse(controller.text) ?? AppConstants.defaultDailyGoal;
-                        onGoalChange(newGoal);
+                        appState.updateDailyGoal(newGoal);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Цель обновлена')),
                         );
@@ -79,7 +77,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton(
-                      onPressed: () => onNavigateToMain(context), // Горизонтальная навигация - pushReplacement
+                      onPressed: () => context.go('/'),
                       child: const Text('Вернуться на главную'),
                     ),
                   ],
@@ -102,7 +100,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     const Text('Трекер водного баланса'),
-                    Text('Версия 1.0.0'),
+                    const Text('Версия 1.0.0'),
                   ],
                 ),
               ),
