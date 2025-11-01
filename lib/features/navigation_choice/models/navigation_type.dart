@@ -1,0 +1,4 @@
+enum NavigationType {
+  pageBased,
+  routeBased,
+}

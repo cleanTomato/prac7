@@ -1,0 +1,38 @@
+// lib/features/water_tracker/models/water_intake.dart
+import 'package:water_tracker/shared/constants/drink_types.dart';
+
+class WaterIntake {
+  final String id;
+  final int volume;
+  final String drinkType;
+  final DateTime time;
+
+  const WaterIntake({  // Добавляем const к конструктору
+    required this.id,
+    required this.volume,
+    required this.drinkType,
+    required this.time,
+  });
+
+  int get effectiveVolume {
+    final drink = DrinkTypes.allTypes.firstWhere(
+          (d) => d.id == drinkType,
+      orElse: () => DrinkTypes.allTypes.first,
+    );
+    return (volume * drink.coefficient).round();
+  }
+
+  WaterIntake copyWith({
+    String? id,
+    int? volume,
+    String? drinkType,
+    DateTime? time,
+  }) {
+    return WaterIntake(
+      id: id ?? this.id,
+      volume: volume ?? this.volume,
+      drinkType: drinkType ?? this.drinkType,
+      time: time ?? this.time,
+    );
+  }
+}
